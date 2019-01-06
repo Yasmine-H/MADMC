@@ -1,0 +1,13 @@
+nom,poids(min),prix(min),pollution(min),puissance moteur(max),couple moteur(max),presentation(max),chassis(max)
+Volkswagen Polo GTI,1269,26900,139,192,320,4,3
+Volkswagen Polo BlueGT,1212,23620,110,150,250,4,3
+Suzuki Swift Sport,1040,15680,147,136,160,3,5
+Renault Clio 4,1204,28100,133,200,240,3,4
+Peugeot 208 GTI,1160,26000,125,208,300,4,5
+Opel Corsa,1218,23900,174,207,280,3,5
+Alfa Romeo Mito Veloce,1145,25890,124,170,250,4,3
+Audi S1 Quattro,1315,35590,166,231,370,5,5
+Abarth 595,1035,18600,139,145,206,4,3
+Ford Fiesta 1.0 Ecoboost,1128,18800,104,140,210,3,4
+Ford Fiesta ST,1163,24950,138,182,240,3,4
+Mini Cooper S,1160,25600,136,192,280,4,4
