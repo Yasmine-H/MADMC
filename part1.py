@@ -26,7 +26,9 @@ def isBetter(val1, val2, columnName):
 
 
 def getWorst(data, rows_indices, criterion, bound=None):
-    
+    """
+    returns worst value given a list 
+    """
     worst = None
     
     for index in rows_indices:
@@ -68,13 +70,17 @@ def get_pareto(data):
       
 def get_ideal(data,pareto):
     """
-    calculer le point idéal et l'approximation du point nadir 
+    calculer le point idéal  
     """
     ideal = {criterion:data[criterion][pareto[criterion][0]] for criterion in pareto.keys()}
     
     return ideal
 
 def get_paretoList(pareto):
+    """
+    retourne une liste des indices des lignes des solutions pareto optimales contenues dans pareto
+    pareto : dict contenant pour chaque critère la liste des indices des solutions opt
+    """"
     rows = []    
     for pareto_list in pareto.values():
         rows += pareto_list
@@ -83,7 +89,10 @@ def get_paretoList(pareto):
     return rows
 
 def get_nadir(data, pareto, fav_criterion=None, bound=None):
-    
+    """
+    retourne une approximation du point nadir. Si une critère est passé en entrée
+    accompagné de sa borne inf on le prend en considération lors du calcul 
+    """
     rows = get_paretoList(pareto)
     nadir = dict((criterion,None) for criterion in pareto.keys()) 
     for criterion in nadir.keys():
@@ -117,7 +126,9 @@ def tchebycheff_augmente(data, pareto, w, ideal, nadir):
 
 
 def update_pareto(data, pareto, fav_criterion, bound):
-      
+    """
+    met à jour les pareto en fonction du critère passé en entrée
+    """
     new_pareto =  dict((criterion,[]) for criterion in pareto.keys()) 
     
     # gather rows to delete
