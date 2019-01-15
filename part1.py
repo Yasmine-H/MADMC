@@ -16,93 +16,169 @@ TODO:
     4/ add the mode automatic mode 
 """
 
-def isBetter(val1, val2, columnName):
+def isBetter(val1, val2, columnName): 
+    '''
+    returns True if val1 is better than val2
+    '''
     if "max" in columnName:
         return val1>val2
     return val1<val2
 
-def update_weights(ideal, nadir, bias=None, preferred_criterion=None):
+
+def getWorst(data, rows_indices, criterion, bound=None):
+    
+    worst = None
+    
+    for index in rows_indices:
+        if worst == None :
+            if bound == None or (isBetter(data[criterion][index],bound,criterion) and not data[criterion][index]==bound):
+                worst = data[criterion][index]
+        elif isBetter(worst,data[criterion][index], criterion):
+            if bound == None or (isBetter(data[criterion][index],bound,criterion) and not data[criterion][index]==bound):
+                worst = data[criterion][index]
+        
+    
+    return worst
+
+def update_weights(ideal, nadir):
     """
     sample the poidss so as to focus around the preferred solution 
     stated by the decision maker
     """
-    if bias is None:
-        bias = dict((criterion,1) for criterion in data.columns.values)
+    diff = np.array([np.abs(nadir[criterion]-ideal[criterion])+0.1 for criterion in nadir.keys()])
     
-    else:
-        bias[preferred_criterion]+=1
+    weights = 1/diff
     
-    diff = np.array([nadir[criterion]-ideal[criterion]+0.1 for criterion in nadir.keys()])
-    
-    weights = [val for val in bias.values()]/diff
-#    weights = np.array([val for val in bias.values()])/sum([val for val in bias.values()])
-
-    return bias, weights
+    return weights
   
-      
-def get_ideal_nadir(data):
-    """
-    calculer le point idéal et l'approximation du point nadir 
-    """
-    ideal_dict = dict((criterion,None) for criterion in data.columns.values if not(criterion=='nom')) 
+def get_pareto(data):
+    pareto = dict((criterion,[]) for criterion in data.columns.values if not(criterion=='nom')) 
     #{} #indexes of rows containing best criterion
     
     for index, row in data.iterrows():
-        for criterion in ideal_dict.keys():
-            if ideal_dict[criterion] == None or isBetter(row[criterion],data[criterion][ideal_dict[criterion]],criterion): # row[criterion] < data[criterion][ideal_dict[criterion]]: 
-                ideal_dict[criterion] = index
-            
-    ideal = {criterion:data[criterion][ideal_dict[criterion]] for criterion in ideal_dict.keys()}
-    nadir = {criterion:max([data[criterion][row] for row in ideal_dict.values()]) 
-    for criterion in ideal_dict.keys()}    
-    return ideal, nadir    
-
-def tchebycheff_augmente(data, w, ideal, nadir):
+        for criterion in pareto.keys():
+#            print(pareto[criterion])
+            if len(pareto[criterion]) == 0: 
+                pareto[criterion] = [index]
+            elif row[criterion] == data[criterion][pareto[criterion][0]]:
+                pareto[criterion].append(index)
+            elif isBetter(row[criterion],data[criterion][pareto[criterion][0]],criterion): # row[criterion] < data[criterion][pareto[criterion]]: 
+                pareto[criterion] = [index]
+    return pareto
+      
+def get_ideal(data,pareto):
     """
-    déterminer la solution la plus proche du point idéal dans la direction du point nadir, au
-    sens de la norme de Tchebycheff augmenté
+    calculer le point idéal et l'approximation du point nadir 
+    """
+    ideal = {criterion:data[criterion][pareto[criterion][0]] for criterion in pareto.keys()}
+    
+    return ideal
+
+def get_paretoList(pareto):
+    rows = []    
+    for pareto_list in pareto.values():
+        rows += pareto_list
+    rows = set(rows)
+#    print(rows)
+    return rows
+
+def get_nadir(data, pareto, fav_criterion=None, bound=None):
+    
+    rows = get_paretoList(pareto)
+    nadir = dict((criterion,None) for criterion in pareto.keys()) 
+    for criterion in nadir.keys():
+        if fav_criterion == None:
+            nadir[criterion] = getWorst(data, rows, criterion)
+        elif criterion == fav_criterion:
+            nadir[criterion] = getWorst(data, rows, criterion, bound)
+            
+    return nadir
+    
+
+def tchebycheff_augmente(data, pareto, w, ideal, nadir):
+    """
     data : solutions (chaque ligne correspond à un ensemble de critères)
     ideal : point de référence
     w : poids associés à chaque critère
     """
-    values = np.zeros((data.shape[0],1))
-    print(values.shape)
+    paretoList = get_paretoList(pareto)
+    values = dict((row,0) for row in paretoList) 
     
+    pareto_list = get_paretoList(pareto)
     epsilon = 0.01
-    for index, row in data.iterrows():
-        difference = [row[criterion] - ideal.get(criterion, 0) for criterion in data.keys()]
+    
+    for index in pareto_list:
+        difference = [data[criterion][index] - ideal[criterion] for criterion in data.keys()]
         c_values = w*(np.abs(difference)) #calcul de la valeur de chaque critère
         values[index] = np.max(c_values) + epsilon*np.sum(difference)
+          
     
-    return values, np.argmin(values)
+    return values, min(values, key=values.get)
+
+
+def update_pareto(data, pareto, fav_criterion, bound):
+      
+    new_pareto =  dict((criterion,[]) for criterion in pareto.keys()) 
+    
+    # gather rows to delete
+    for criterion in pareto.keys():
+        for index in pareto[criterion]:
+            if not data[fav_criterion][index] == bound and isBetter(data[fav_criterion][index], bound, fav_criterion) :
+                new_pareto[criterion].append(index)
+    
+    return new_pareto            
 
 
 def interaction(df, data):
     
     stop = False
-    
-    ideal, nadir = get_ideal_nadir(data)
+    pareto = get_pareto(data)
+    print("pareto :", pareto)
+    ideal = get_ideal(data, pareto)
     print("ideal :",ideal)
-    print("nadir :",nadir)
-    
-    bias, w = update_weights(ideal, nadir)
     while not stop:
-        values, best_index = tchebycheff_augmente(data, w, ideal, nadir)
+        
+        # process Nadir
+        nadir = get_nadir(data,pareto)
+        print("***new nadir \n",nadir)
+        
+        # update the weights
+        w = update_weights(ideal, nadir)
+        
+        # apply augmented tchebytcheff
+        values, best_index = tchebycheff_augmente(data, pareto, w, ideal, nadir)
         print("Solution qu'on vous propose : ", df['nom'][best_index],"\nValeurs :")
+        
+        # show result
         for criterion in data.columns:
             print(criterion, ":", data[criterion][best_index])
+        
+        # ask if satisfied
         satisfait = input("Etes-vous satisfait de la solution retournée? \no : oui \nn : non \nvotre réponse : ")
         if satisfait == "o" : 
             stop = True
         else :
-#            identifier le critère principal sur lequel il faudrait apporter une amélioration 
-#            et le cas échéant de
-#            proposer une solution qui va dans le sens indiqué
+
+            # get favorite criterion to improve
             print("************\nListe des critères : ",data.columns.values)
             c = input("Quel est le critère que vous voulez favoriser ?")
             while c not in data.columns:
                 c = input("Quel est le critère que vous voulez favoriser ?")
-            bias, w = update_weights(ideal, nadir, bias=bias, preferred_criterion=c)
+            bound = data[c][best_index]
+            
+            print("---- criterion : ", c," bound =", bound)
+            
+            # reduce pareto front
+            pareto = update_pareto(data, pareto, c, bound)
+            
+            # check if there are solutions left
+            pareto_list = get_paretoList(pareto)
+            if len(pareto_list) == 0:
+                print("Aucune solution ne correspond à vos critères")
+                stop = True
+#            print("***new pareto \n",pareto)
+            
+    
 
 
             
