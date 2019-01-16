@@ -31,25 +31,60 @@ def update_weights(ideal, nadir):
     sample the poidss so as to focus around the preferred solution
     stated by the decision maker
     """
-    diff = np.array([np.abs(nadir[criterion]-ideal[criterion])+0.1 for criterion in nadir.keys()])
+    diff = np.array([nadir[criterion]-ideal[criterion]+0.1 for criterion in nadir.keys()])
 
     weights = 1/diff
 
     return weights
 
+
+def isDominatedBy(data, index1, index2):
+    """
+    returns True if index of solution 1 is dominated by index of solution 2
+    """
+    
+    for criterion in data.columns.values:
+        if isBetter(data[criterion][index1], data[criterion][index2], criterion):
+#            if index1 == 10:
+#                print(criterion, index2, data[criterion][index1], data[criterion][index2],isBetter(data[criterion][index1], data[criterion][index2], criterion) )
+            return False
+            
+    return True
+
+
 def get_pareto(data):
     pareto = dict((criterion,[]) for criterion in data.columns.values if not(criterion=='nom'))
     #{} #indexes of rows containing best criterion
-
+    
+    # gather the best row for each criterion
     for index, row in data.iterrows():
         for criterion in pareto.keys():
 #            print(pareto[criterion])
-            if len(pareto[criterion]) == 0:
+            if len(pareto[criterion]) == 0: # no element
                 pareto[criterion] = [index]
-            elif row[criterion] == data[criterion][pareto[criterion][0]]:
+            elif row[criterion] == data[criterion][pareto[criterion][0]]: # element with same value
                 pareto[criterion].append(index)
-            elif isBetter(row[criterion],data[criterion][pareto[criterion][0]],criterion): # row[criterion] < data[criterion][pareto[criterion]]:
+            elif isBetter(row[criterion],data[criterion][pareto[criterion][0]],criterion): # new best element
                 pareto[criterion] = [index]
+                
+    # check if none of the rows is pareto dominated
+    pareto_list = get_paretoList(pareto)
+
+    dominated_points = set([])
+    
+    for i in pareto_list:
+        for j in pareto_list:
+            if not i == j and isDominatedBy(data, i, j):
+                dominated_points.add(i)
+                break
+    
+    # remove dominated from pareto
+    for criterion in pareto.keys():
+#            print(criterion, pareto[criterion])
+            for row in dominated_points:
+                if row in pareto[criterion]:
+                    pareto[criterion].remove(row)
+    
     return pareto
 
 def get_ideal(data,pareto):

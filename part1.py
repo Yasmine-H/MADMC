@@ -8,15 +8,6 @@ import matplotlib as plt
 from utils import *
 
 
-"""
-TODO:
-    1/ what if ideal==nadir ? 
-    2/ change the weights update procedure ?
-    3/ a lot of tests, ex. with 2 values and plot them
-    4/ add the mode automatic mode 
-"""
-
-
 def tchebycheff_augmente(data, pareto, w, ideal, nadir):
     """
     data : solutions (chaque ligne correspond à un ensemble de critères)
@@ -26,14 +17,12 @@ def tchebycheff_augmente(data, pareto, w, ideal, nadir):
     paretoList = get_paretoList(pareto)
     values = dict((row,0) for row in paretoList) 
     
-    pareto_list = get_paretoList(pareto)
     epsilon = 0.01
     
     for index in pareto_list:
-        difference = [data[criterion][index] - ideal[criterion] for criterion in data.keys()]
-        c_values = w*(np.abs(difference)) #calcul de la valeur de chaque critère
+        difference = [abs(data[criterion][index] - ideal[criterion]) for criterion in data.keys()]
+        c_values = w*(difference) #calcul de la valeur de chaque critère
         values[index] = np.max(c_values) + epsilon*np.sum(difference)
-          
     
     return values, min(values, key=values.get)
 
@@ -57,25 +46,37 @@ def interaction(df, data):
     
     stop = False
     pareto = get_pareto(data)
-    print("pareto :", pareto)
-    ideal = get_ideal(data, pareto)
-    print("ideal :",ideal)
-    while not stop:
+    print("Solutions de pareto :", get_paretoList(pareto))
+    
+    suggestion = input("Avez vous une solution en tête que vous aimeriez approcher?\no : oui\nn : non\nvotre réponse : ")
+    if suggestion == "o":
+        reference = {criterion:0 for criterion in data.columns.values}
+        print("Veuillez donner la valeur idéale attendue sur chaque critère :")
+        for criterion in reference.keys():
+            reference[criterion] = int(input(criterion+" : "))
         
+    else:
+        reference = get_ideal(data, pareto)
+    print("Point de référence :",reference)
+    while not stop:
+
         # process Nadir
         nadir = get_nadir(data,pareto)
-        print("***new nadir \n",nadir)
         
         # update the weights
-        w = update_weights(ideal, nadir)
+        w = update_weights(reference, nadir)
         
         # apply augmented tchebytcheff
-        values, best_index = tchebycheff_augmente(data, pareto, w, ideal, nadir)
+        values, best_index = tchebycheff_augmente(data, pareto, w, reference, nadir)
+       
+        print(values)
+        # show result
+        print("**************************************************")
         print("Solution qu'on vous propose : ", df['nom'][best_index],"\nValeurs :")
         
-        # show result
         for criterion in data.columns:
             print(criterion, ":", data[criterion][best_index])
+        print("**************************************************")
         
         # ask if satisfied
         satisfait = input("Etes-vous satisfait de la solution retournée? \no : oui \nn : non \nvotre réponse : ")
@@ -85,12 +86,12 @@ def interaction(df, data):
 
             # get favorite criterion to improve
             print("************\nListe des critères : ",data.columns.values)
-            c = input("Quel est le critère que vous voulez favoriser ?")
+            c = input("Quel est le critère que vous voulez améliorer ?")
             while c not in data.columns:
-                c = input("Quel est le critère que vous voulez favoriser ?")
+                c = input("Erreur. \nQuel est le critère que vous voulez améliorer ?\nRéponse : ")
             bound = data[c][best_index]
             
-            print("---- criterion : ", c," bound =", bound)
+#            print("Select criterion : ", c," bound : ", bound)
             
             # reduce pareto front
             pareto = update_pareto(data, pareto, c, bound)
@@ -100,7 +101,7 @@ def interaction(df, data):
             if len(pareto_list) == 0:
                 print("Aucune solution ne correspond à vos critères")
                 stop = True
-#            print("***new pareto \n",pareto)
+
             
     
 
