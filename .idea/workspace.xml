@@ -2,7 +2,6 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="eaa85b05-0f8c-43f3-bee5-ca5712c0338f" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/gurobi.log" beforeDir="false" afterPath="$PROJECT_DIR$/gurobi.log" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/part2.py" beforeDir="false" afterPath="$PROJECT_DIR$/part2.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pmr_model.lp" beforeDir="false" afterPath="$PROJECT_DIR$/pmr_model.lp" afterDir="false" />
@@ -14,7 +13,7 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="CoverageDataManager">
-    <SUITE FILE_PATH="coverage/MADMC$part2.coverage" NAME="part2 Coverage Results" MODIFIED="1547635565535" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/MADMC$part2.coverage" NAME="part2 Coverage Results" MODIFIED="1547639004766" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/MADMC$Unnamed.coverage" NAME="Unnamed Coverage Results" MODIFIED="1547594267882" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
   </component>
   <component name="FUSProjectUsageTrigger">
@@ -44,12 +43,12 @@
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
           <entry key="Python Console" value="65" />
-          <entry key="py" value="12981" />
+          <entry key="py" value="13841" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
-          <entry key="Python" value="13046" />
+          <entry key="Python" value="13906" />
         </counts>
       </usages-collector>
     </session>
@@ -59,14 +58,14 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/part2.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1100">
-              <caret line="87" selection-start-line="87" selection-end-line="87" />
+            <state relative-caret-position="323">
+              <caret line="85" column="28" selection-start-line="85" selection-start-column="28" selection-end-line="85" selection-end-column="28" />
               <folding>
                 <element signature="e#0#22#0" expanded="true" />
-                <marker date="1547635672069" expanded="true" signature="137:770" ph="..." />
-                <marker date="1547635672069" expanded="true" signature="1512:1564" ph="..." />
-                <marker date="1547635672069" expanded="true" signature="1617:2262" ph="..." />
-                <marker date="1547635672069" expanded="true" signature="2314:3463" ph="..." />
+                <marker date="1547639002083" expanded="true" signature="137:770" ph="..." />
+                <marker date="1547639002083" expanded="true" signature="1607:1659" ph="..." />
+                <marker date="1547639002083" expanded="true" signature="1712:2357" ph="..." />
+                <marker date="1547639002083" expanded="true" signature="2409:3822" ph="..." />
               </folding>
             </state>
           </provider>
@@ -76,7 +75,7 @@
         <entry file="file://$PROJECT_DIR$/pmr_model.lp">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="136">
-              <caret line="52" selection-start-line="52" selection-end-line="52" />
+              <caret line="47" selection-start-line="47" selection-end-line="47" />
             </state>
           </provider>
         </entry>
@@ -104,7 +103,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/utils.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="578">
+            <state relative-caret-position="-238">
               <caret line="34" selection-start-line="34" selection-end-line="34" />
             </state>
           </provider>
@@ -308,7 +307,7 @@
     <entry file="file://$PROJECT_DIR$/pmr_model.lp">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="136">
-          <caret line="52" selection-start-line="52" selection-end-line="52" />
+          <caret line="47" selection-start-line="47" selection-end-line="47" />
         </state>
       </provider>
     </entry>
@@ -323,13 +322,6 @@
         <state showInfoPanel="true" fixedHeaders="false" rowLines="3" />
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/utils.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="578">
-          <caret line="34" selection-start-line="34" selection-end-line="34" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/part1.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="279">
@@ -340,16 +332,23 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/utils.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-238">
+          <caret line="34" selection-start-line="34" selection-end-line="34" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/part2.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1100">
-          <caret line="87" selection-start-line="87" selection-end-line="87" />
+        <state relative-caret-position="323">
+          <caret line="85" column="28" selection-start-line="85" selection-start-column="28" selection-end-line="85" selection-end-column="28" />
           <folding>
             <element signature="e#0#22#0" expanded="true" />
-            <marker date="1547635672069" expanded="true" signature="137:770" ph="..." />
-            <marker date="1547635672069" expanded="true" signature="1512:1564" ph="..." />
-            <marker date="1547635672069" expanded="true" signature="1617:2262" ph="..." />
-            <marker date="1547635672069" expanded="true" signature="2314:3463" ph="..." />
+            <marker date="1547639002083" expanded="true" signature="137:770" ph="..." />
+            <marker date="1547639002083" expanded="true" signature="1607:1659" ph="..." />
+            <marker date="1547639002083" expanded="true" signature="1712:2357" ph="..." />
+            <marker date="1547639002083" expanded="true" signature="2409:3822" ph="..." />
           </folding>
         </state>
       </provider>

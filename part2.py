@@ -27,13 +27,13 @@ def max_regret(x, alternative_list, preference_statements):
     pairwise_regrets = [pairwise_max_regret(x, a, preference_statements) for a in alternative_list]
     regret_values = np.array([x[0] for x in pairwise_regrets])
     max_idx = np.argwhere(regret_values == np.amax(regret_values))
-    return max_idx.flatten(), pairwise_regrets[max_idx[0][0]][0]
+    return max_idx.flatten(), pairwise_regrets[max_idx[0][0]][0], [pairwise_regrets[idx][1] for idx in max_idx[0]]
 
 def minimax_regret(alternative_list, preference_statements):
     max_regrets = [max_regret(x, alternative_list, preference_statements) for x in alternative_list]
     regret_values = np.array([x[1] for x in max_regrets])
     min_idx = np.argwhere(regret_values == np.amin(regret_values))
-    return min_idx.flatten(), max_regrets[min_idx[0][0]][1]
+    return min_idx.flatten(), max_regrets[min_idx[0][0]][1], [max_regrets[idx][2] for idx in min_idx[0]]
 
 def pandas_series_to_list(columns, a):
     return [x for _, x in a[columns].iteritems()]
@@ -77,12 +77,17 @@ def interactive_elicitation(raw_data, alternatives):
     while not stop:
         iter += 1
 
-        x_p_idx, v_mmr = minimax_regret(alternatives, preference_statements)
+        x_p_idx, v_mmr, weights = minimax_regret(alternatives, preference_statements)
+        print(np.array(weights).flatten())
         print(v_mmr)
         if np.isclose(v_mmr, 0):
             print("end")
+            print(weights)
+            weights = np.array(weights).flatten()
+            for (_, d), a in zip(raw_data.iterrows(), alternatives):
+                print(d, np.dot(weights, a.transpose()))
             stop = True
-            break
+            return weights
 
         print("iteration : ", iter)
 
