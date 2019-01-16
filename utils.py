@@ -174,3 +174,17 @@ def plot(data, pareto, ideal, nadir, solution,i):
            ncol=2, mode="expand", borderaxespad=0.)
    
     plt.show()
+
+def update_pareto(data, pareto, fav_criterion, bound):
+    """
+    update the pareto list according to the criterion fav_criterion and its bound
+    """
+    new_pareto =  dict((criterion,[]) for criterion in pareto.keys())
+
+
+    for criterion in pareto.keys():
+        for index in pareto[criterion]:
+            if not data[fav_criterion][index] == bound and isBetter(data[fav_criterion][index], bound, fav_criterion):
+                new_pareto[criterion].append(index)
+
+    return new_pareto

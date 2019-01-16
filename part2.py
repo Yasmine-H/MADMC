@@ -107,6 +107,45 @@ def interactive_elicitation(raw_data, alternatives):
         else:
             preference_statements.append((y_p, x_p))
 
+def automatic_elicitation(raw_data, alternatives, dm):
+    print("Elicitation interactive. Nous allons vous présenter une série de question afin de déterminer vos préférences ...")
+
+    stop = False
+    preference_statements = []
+    columns = [c for c in raw_data.columns.values if c != "nom"]
+    orig_data = raw_data[columns]
+
+    iter = 0
+    while not stop:
+        iter += 1
+
+        x_p_idx, v_mmr, weights = minimax_regret(alternatives, preference_statements)
+        print(np.array(weights).flatten())
+        print(v_mmr)
+        if np.isclose(v_mmr, 0):
+            print("end")
+            print(weights)
+            weights = np.array(weights).flatten()
+            for (_, d), a in zip(raw_data.iterrows(), alternatives):
+                print(d, np.dot(weights, a.transpose()))
+            stop = True
+            return weights
+
+        print("iteration : ", iter)
+
+        x_p_idx = np.random.choice(x_p_idx)
+        x_p = alternatives[x_p_idx]
+        y_p_idx = np.random.choice(max_regret(x_p, alternatives, preference_statements)[0])
+        y_p = alternatives[y_p_idx]
+
+        print(x_p_idx, y_p_idx)
+
+
+        if dm(x_p) >= dm(y_p):
+            preference_statements.append((x_p, y_p))
+        else:
+            preference_statements.append((y_p, x_p))
+
 
 if __name__ == "__main__":
     raw_data = pd.read_csv("voitures.csv")
@@ -126,7 +165,7 @@ if __name__ == "__main__":
 
     # Normalization of the data
     alternatives = []
-    for _, row in raw_data.iterrows():
+    for _, row in raw_data.iloc[pareto_alternatives].iterrows():
         alternatives.append(np.hstack(((min_nadir - row[min_cols].values) / min_norm_factor, row[max_cols].values / max_norm_factor)))
 
     #alternatives /= np.amax(alternatives, axis=0)
@@ -139,4 +178,6 @@ if __name__ == "__main__":
     #                          [(alternatives[1], alternatives[0]), (alternatives[0], alternatives[29])]))
     print(max_regret(alternatives[14], alternatives, pref))
     #print(minimax_regret(alternatives, pref))
-    interactive_elicitation(raw_data, alternatives)
+    #interactive_elicitation(raw_data, alternatives)
+    dm1 = lambda x: np.dot(np.array([0, 0.5, 0.5, 0, 0, 0, 0]), x)
+    print(automatic_elicitation(raw_data, alternatives, dm1))
