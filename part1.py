@@ -12,19 +12,19 @@ def tchebycheff_augmente(data, pareto, w, ideal, nadir):
     """
     process the aumented tchebytcheff value for each solution among pareto 
     data : solutions (columns = criteria, rows = solutions)
-    pareto : list of indices of therows of the best solutions in data
+    pareto : list of indices of the rows of the best solutions in data
     ideal : reference point
     w : weights for each criterion
     """
     pareto_list = get_paretoList(pareto)
     values = dict((row,0) for row in pareto_list) 
     
-    epsilon = 0.01
+    epsilon = 0.5
     
     for index in pareto_list:
         difference = [abs(data[criterion][index] - ideal[criterion]) for criterion in data.keys()]
         c_values = w*(difference) #calcul de la valeur de chaque critère
-        values[index] = np.max(c_values) + epsilon*np.sum(difference)
+        values[index] = np.max(c_values) + epsilon*np.sum(c_values)
     
     return values, min(values, key=values.get)
 
@@ -35,7 +35,7 @@ def update_pareto(data, pareto, fav_criterion, bound):
     """
     new_pareto =  dict((criterion,[]) for criterion in pareto.keys()) 
     
-    # gather rows to delete
+    
     for criterion in pareto.keys():
         for index in pareto[criterion]:
             if not data[fav_criterion][index] == bound and isBetter(data[fav_criterion][index], bound, fav_criterion):
@@ -52,6 +52,7 @@ def interaction(df, data):
     
     stop = False
     pareto = get_pareto(data)
+    print(pareto)
     print("Solutions de pareto :", get_paretoList(pareto))
     
     
