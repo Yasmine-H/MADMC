@@ -24,16 +24,14 @@ def pairwise_max_regret(x, y, preference_statements):
 
 
 def max_regret(x, alternative_list, preference_statements):
-    max_idx = np.argmax(np.array([pairwise_max_regret(x, a, preference_statements)[0] for a in alternative_list]))
-    print("hey")
-    tst = [pairwise_max_regret(x, a, preference_statements)[0] for a in alternative_list]
-    print(tst)
-    print(max_idx)
-    return max_idx, alternative_list[max_idx]
+    pairwise_regrets = [pairwise_max_regret(x, a, preference_statements) for a in alternative_list]
+    max_idx = np.argmax(np.array([x[0] for x in pairwise_regrets]))
+    return max_idx, pairwise_regrets[max_idx][0]
 
 def minimax_regret(alternative_list, preference_statements):
-    min_idx = np.argmin(np.array([max_regret(x, alternative_list, preference_statements)[0] for x in alternative_list]))
-    return min_idx, alternative_list[min_idx]
+    max_regrets = [max_regret(x, alternative_list, preference_statements) for x in alternative_list]
+    min_idx = np.argmin(np.array([x[1] for x in max_regrets]))
+    return min_idx, max_regrets[min_idx][1]
 
 if __name__ == "__main__":
     raw_data = pd.read_csv("voitures.csv")
@@ -64,3 +62,4 @@ if __name__ == "__main__":
     #print(pairwise_max_regret(alternatives[1], alternatives[0],
     #                          [(alternatives[1], alternatives[0]), (alternatives[0], alternatives[29])]))
     print(max_regret(alternatives[14], alternatives, pref))
+    print(minimax_regret(alternatives, pref))
