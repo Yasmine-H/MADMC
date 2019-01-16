@@ -25,13 +25,83 @@ def pairwise_max_regret(x, y, preference_statements):
 
 def max_regret(x, alternative_list, preference_statements):
     pairwise_regrets = [pairwise_max_regret(x, a, preference_statements) for a in alternative_list]
-    max_idx = np.argmax(np.array([x[0] for x in pairwise_regrets]))
-    return max_idx, pairwise_regrets[max_idx][0]
+    regret_values = np.array([x[0] for x in pairwise_regrets])
+    max_idx = np.argwhere(regret_values == np.amax(regret_values))
+    return max_idx.flatten(), pairwise_regrets[max_idx[0][0]][0]
 
 def minimax_regret(alternative_list, preference_statements):
     max_regrets = [max_regret(x, alternative_list, preference_statements) for x in alternative_list]
-    min_idx = np.argmin(np.array([x[1] for x in max_regrets]))
-    return min_idx, max_regrets[min_idx][1]
+    regret_values = np.array([x[1] for x in max_regrets])
+    min_idx = np.argwhere(regret_values == np.amin(regret_values))
+    return min_idx.flatten(), max_regrets[min_idx[0][0]][1]
+
+def pandas_series_to_list(columns, a):
+    return [x for _, x in a[columns].iteritems()]
+
+def build_alternative_choice_string(columns, a1, a2):
+    lines1 = []
+    lines2 = []
+    a1 = pandas_series_to_list(columns, a1)
+    a2 = pandas_series_to_list(columns, a2)
+    res = "Laquelle préférez vous ? Tapez 1 ou 2 : \n"
+
+    for (c, d) in zip(columns, a1):
+        lines1.append(c + " : " + str(d))
+
+    for (c, d) in zip(columns, a2):
+        lines2.append(c + " : " + str(d))
+
+    length = []
+
+    for (l1, l2) in zip(lines1, lines2):
+        length.append(len(l1))
+
+    idx = np.argmax(length)
+    max_length = len(lines1[idx])
+
+    for (l1, l2) in zip(lines1, lines2):
+        curr_length = len(l1)
+        res += l1 + " " * (max_length - curr_length + 4) + l2 + "\n"
+
+    return res
+
+def interactive_elicitation(raw_data, alternatives):
+    print("Elicitation interactive. Nous allons vous présenter une série de question afin de déterminer vos préférences ...")
+
+    stop = False
+    preference_statements = []
+    columns = [c for c in raw_data.columns.values if c != "nom"]
+    orig_data = raw_data[columns]
+
+    iter = 0
+    while not stop:
+        iter += 1
+
+        x_p_idx, v_mmr = minimax_regret(alternatives, preference_statements)
+        print(v_mmr)
+        if np.isclose(v_mmr, 0):
+            print("end")
+            stop = True
+            break
+
+        print("iteration : ", iter)
+
+        x_p_idx = np.random.choice(x_p_idx)
+        x_p = alternatives[x_p_idx]
+        y_p_idx = np.random.choice(max_regret(x_p, alternatives, preference_statements)[0])
+        y_p = alternatives[y_p_idx]
+
+        print(x_p_idx, y_p_idx)
+
+        choice = ""
+        while not choice == "1" and not choice == "2":
+            choice = input(build_alternative_choice_string(columns, orig_data.iloc[x_p_idx], orig_data.iloc[y_p_idx]))
+
+        if choice == "1":
+            preference_statements.append((x_p, y_p))
+        else:
+            preference_statements.append((y_p, x_p))
+
 
 if __name__ == "__main__":
     raw_data = pd.read_csv("voitures.csv")
@@ -62,4 +132,5 @@ if __name__ == "__main__":
     #print(pairwise_max_regret(alternatives[1], alternatives[0],
     #                          [(alternatives[1], alternatives[0]), (alternatives[0], alternatives[29])]))
     print(max_regret(alternatives[14], alternatives, pref))
-    print(minimax_regret(alternatives, pref))
+    #print(minimax_regret(alternatives, pref))
+    interactive_elicitation(raw_data, alternatives)
