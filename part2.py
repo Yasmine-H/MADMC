@@ -118,6 +118,7 @@ if __name__ == "__main__":
     pareto_front = get_pareto(raw_data)
     nadir = get_nadir(raw_data, pareto_front)
     ideal = get_ideal(raw_data, pareto_front)
+    pareto_alternatives = list(get_paretoList(pareto_front))
     min_nadir = np.array([nadir[k] for k in min_cols])
     min_norm_factor = min_nadir - np.array([ideal[k] for k in min_cols])
     max_norm_factor = np.array([ideal[k] for k in max_cols]) - np.array([nadir[k] for k in max_cols])
@@ -133,7 +134,7 @@ if __name__ == "__main__":
     print(alternatives)
     print(alternatives.shape)
     print(alternatives[0], alternatives[1])
-    pref = [(alternatives[13], alternatives[0]), (alternatives[7], alternatives[0]), (alternatives[9], alternatives[10]), (alternatives[13], alternatives[30]), (alternatives[3], alternatives[4])]
+    pref = [(alternatives[13], alternatives[0]), (alternatives[7], alternatives[0]), (alternatives[9], alternatives[10]), (alternatives[13], alternatives[12]), (alternatives[3], alternatives[4])]
     #print(pairwise_max_regret(alternatives[1], alternatives[0],
     #                          [(alternatives[1], alternatives[0]), (alternatives[0], alternatives[29])]))
     print(max_regret(alternatives[14], alternatives, pref))
