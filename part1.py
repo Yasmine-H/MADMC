@@ -14,8 +14,8 @@ def tchebycheff_augmente(data, pareto, w, ideal, nadir):
     ideal : point de référence
     w : poids associés à chaque critère
     """
-    paretoList = get_paretoList(pareto)
-    values = dict((row,0) for row in paretoList) 
+    pareto_list = get_paretoList(pareto)
+    values = dict((row,0) for row in pareto_list) 
     
     epsilon = 0.01
     
