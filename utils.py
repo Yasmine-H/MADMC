@@ -26,6 +26,15 @@ def getWorst(data, rows_indices, criterion, bound=None):
 
     return worst
 
+
+def getBest(data, rows_indices, criterion):
+    best = None
+    for index in rows_indices:
+        if best == None or isBetter(data[criterion][index], data[criterion][best], criterion):
+            best = index
+    
+    return best
+
 def update_weights(ideal, nadir):
     """
     sample the poidss so as to focus around the preferred solution
@@ -60,12 +69,13 @@ def get_pareto(data):
     for index, row in data.iterrows():
         for criterion in pareto.keys():
 #            print(pareto[criterion])
-            if len(pareto[criterion]) == 0: # no element
-                pareto[criterion] = [index]
-            elif row[criterion] == data[criterion][pareto[criterion][0]]: # element with same value
-                pareto[criterion].append(index)
-            elif isBetter(row[criterion],data[criterion][pareto[criterion][0]],criterion): # new best element
-                pareto[criterion] = [index]
+            pareto[criterion].append(index)
+#            if len(pareto[criterion]) == 0: # no element
+#                pareto[criterion] = [index]
+#            elif row[criterion] == data[criterion][pareto[criterion][0]]: # element with same value
+#                pareto[criterion].append(index)
+#            elif isBetter(row[criterion],data[criterion][pareto[criterion][0]],criterion): # new best element
+#                pareto[criterion] = [index]
                 
     # check if none of the rows is pareto dominated
     pareto_list = get_paretoList(pareto)
@@ -76,6 +86,7 @@ def get_pareto(data):
         for j in pareto_list:
             if not i == j and isDominatedBy(data, i, j):
                 dominated_points.add(i)
+#                print(i," dominé par ",j)
                 break
     
     # remove dominated from pareto
@@ -91,7 +102,7 @@ def get_ideal(data,pareto):
     """
     calculer le point idéal
     """
-    ideal = {criterion:data[criterion][pareto[criterion][0]] for criterion in pareto.keys()}
+    ideal = {criterion:data[criterion][getBest(data, pareto[criterion], criterion)] for criterion in pareto.keys()}
 
     return ideal
 

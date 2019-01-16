@@ -48,6 +48,7 @@ def interaction(df, data):
     pareto = get_pareto(data)
     print("Solutions de pareto :", get_paretoList(pareto))
     
+    
     suggestion = input("Avez vous une solution en tête que vous aimeriez approcher?\no : oui\nn : non\nvotre réponse : ")
     if suggestion == "o":
         reference = {criterion:0 for criterion in data.columns.values}
@@ -109,7 +110,8 @@ def interaction(df, data):
             
 df = pandas.read_csv('voitures.csv')
 print(df)
-data = df[['presentation(max)','chassis(max)','prix(min)']] # valeurs utilisées
+#data = df[['presentation(max)','chassis(max)','prix(min)']] # valeurs utilisées
+data = df[['pollution(min)','couple moteur(max)']] # valeurs utilisées
 print(data)
 
 
