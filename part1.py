@@ -55,21 +55,26 @@ def interaction(df, data):
         print("Veuillez donner la valeur idéale attendue sur chaque critère :")
         for criterion in reference.keys():
             reference[criterion] = int(input(criterion+" : "))
-        
+
     else:
         reference = get_ideal(data, pareto)
     print("Point de référence :",reference)
+    
     while not stop:
 
         # process Nadir
         nadir = get_nadir(data,pareto)
+        
+        
         
         # update the weights
         w = update_weights(reference, nadir)
         
         # apply augmented tchebytcheff
         values, best_index = tchebycheff_augmente(data, pareto, w, reference, nadir)
-       
+        
+        # plot values
+        plot(data, get_paretoList(pareto), reference, nadir, best_index)
         print(values)
         # show result
         print("**************************************************")

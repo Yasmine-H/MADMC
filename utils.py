@@ -1,4 +1,5 @@
 import numpy as np
+import matplotlib.pyplot as plt
 
 def isBetter(val1, val2, columnName):
     '''
@@ -70,12 +71,6 @@ def get_pareto(data):
         for criterion in pareto.keys():
 #            print(pareto[criterion])
             pareto[criterion].append(index)
-#            if len(pareto[criterion]) == 0: # no element
-#                pareto[criterion] = [index]
-#            elif row[criterion] == data[criterion][pareto[criterion][0]]: # element with same value
-#                pareto[criterion].append(index)
-#            elif isBetter(row[criterion],data[criterion][pareto[criterion][0]],criterion): # new best element
-#                pareto[criterion] = [index]
                 
     # check if none of the rows is pareto dominated
     pareto_list = get_paretoList(pareto)
@@ -132,3 +127,34 @@ def get_nadir(data, pareto, fav_criterion=None, bound=None):
             nadir[criterion] = getWorst(data, rows, criterion, bound)
 
     return nadir
+
+def plot(data, pareto, ideal, nadir, solution):
+    
+    criteria = [criterion for criterion in data.columns.values]
+    
+    
+    pareto_x = [data[criteria[0]][index] for index in pareto]
+    pareto_y = [data[criteria[1]][index] for index in pareto]
+    
+    ideal_x = ideal[criteria[0]] 
+    ideal_y = ideal[criteria[1]] 
+    
+    nadir_x = nadir[criteria[0]] 
+    nadir_y = nadir[criteria[1]] 
+    
+    print(solution)
+    solution_x = data[criteria[0]][solution]
+    solution_y = data[criteria[1]][solution]
+
+    plt.xlabel(criteria[0])
+    plt.ylabel(criteria[1])
+    plt.plot(data[criteria[0]], data[criteria[1]], 'ko', label="points éliminés")
+    plt.plot(pareto_x, pareto_y, 'mo', label="solutions pareto optimales restantes")
+    plt.plot(ideal_x, ideal_y, 'go', label="point référence")
+    plt.plot(nadir_x, nadir_y, 'ro', label="point nadir")
+    plt.plot(solution_x, solution_y, 'bo', label="solution proposée")
+    
+    plt.legend(bbox_to_anchor=(0., 1.02, 1., .102), loc=3,
+           ncol=2, mode="expand", borderaxespad=0.)
+
+    plt.show()
