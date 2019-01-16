@@ -59,6 +59,7 @@ def interaction(df, data):
     else:
         reference = get_ideal(data, pareto)
     print("Point de référence :",reference)
+    count = 0
     
     while not stop:
 
@@ -74,7 +75,7 @@ def interaction(df, data):
         values, best_index = tchebycheff_augmente(data, pareto, w, reference, nadir)
         
         # plot values
-        plot(data, get_paretoList(pareto), reference, nadir, best_index)
+        plot(data, get_paretoList(pareto), reference, nadir, best_index, count)
         print(values)
         # show result
         print("**************************************************")
@@ -108,13 +109,13 @@ def interaction(df, data):
                 print("Aucune solution ne correspond à vos critères")
                 stop = True
 
-            
+        count += 1
     
 
 
             
 df = pandas.read_csv('voitures.csv')
-print(df)
+#print(df)
 #data = df[['presentation(max)','chassis(max)','prix(min)']] # valeurs utilisées
 data = df[['pollution(min)','couple moteur(max)']] # valeurs utilisées
 print(data)

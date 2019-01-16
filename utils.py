@@ -128,7 +128,7 @@ def get_nadir(data, pareto, fav_criterion=None, bound=None):
 
     return nadir
 
-def plot(data, pareto, ideal, nadir, solution):
+def plot(data, pareto, ideal, nadir, solution,i):
     
     criteria = [criterion for criterion in data.columns.values]
     
@@ -156,5 +156,5 @@ def plot(data, pareto, ideal, nadir, solution):
     
     plt.legend(bbox_to_anchor=(0., 1.02, 1., .102), loc=3,
            ncol=2, mode="expand", borderaxespad=0.)
-
-    plt.show()
+    plt.savefig("result_"+str(i))
+#    plt.show()
