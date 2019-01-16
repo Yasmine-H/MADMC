@@ -12,7 +12,7 @@ def isBetter(val1, val2, columnName):
 
 def getWorst(data, rows_indices, criterion, bound=None):
     """
-    returns worst value given a list
+    returns worst value among the selected rows of data for a given criterion
     """
     worst = None
 
@@ -29,6 +29,9 @@ def getWorst(data, rows_indices, criterion, bound=None):
 
 
 def getBest(data, rows_indices, criterion):
+    """
+    returns index of best value among the rows of data for a given criterion
+    """
     best = None
     for index in rows_indices:
         if best == None or isBetter(data[criterion][index], data[criterion][best], criterion):
@@ -36,21 +39,22 @@ def getBest(data, rows_indices, criterion):
     
     return best
 
-def update_weights(ideal, nadir):
+def update_weights(reference, nadir):
     """
-    sample the poidss so as to focus around the preferred solution
-    stated by the decision maker
+    update the weights according to the difference between the reference point and nadir
     """
-    diff = np.array([nadir[criterion]-ideal[criterion]+0.1 for criterion in nadir.keys()])
+    print(nadir, reference)
+    diff = np.array([abs(nadir[criterion]-reference[criterion])+0.1 for criterion in nadir.keys()])
 
     weights = 1/diff
+#    print("-------------- new weights!! ",weights)
 
     return weights
 
 
 def isDominatedBy(data, index1, index2):
     """
-    returns True if index of solution 1 is dominated by index of solution 2
+    returns True if solution at row index1 is dominated by the solution at row of index 2 
     """
     
     for criterion in data.columns.values:
@@ -63,18 +67,22 @@ def isDominatedBy(data, index1, index2):
 
 
 def get_pareto(data):
+    """
+    returns the pareto solutions 
+    """
     pareto = dict((criterion,[]) for criterion in data.columns.values if not(criterion=='nom'))
     #{} #indexes of rows containing best criterion
     
-    # gather the best row for each criterion
+    # gather the possible rows for each criterion (initialize dict)
     for index, row in data.iterrows():
         for criterion in pareto.keys():
 #            print(pareto[criterion])
             pareto[criterion].append(index)
                 
-    # check if none of the rows is pareto dominated
+   
     pareto_list = get_paretoList(pareto)
 
+    # process list of dominated points among the list of pareto solutions
     dominated_points = set([])
     
     for i in pareto_list:
@@ -95,7 +103,7 @@ def get_pareto(data):
 
 def get_ideal(data,pareto):
     """
-    calculer le point idéal
+    process the ideal point (fictive point with the best possible value for each criterion)
     """
     ideal = {criterion:data[criterion][getBest(data, pareto[criterion], criterion)] for criterion in pareto.keys()}
 
@@ -103,8 +111,8 @@ def get_ideal(data,pareto):
 
 def get_paretoList(pareto):
     """
-    retourne une liste des indices des lignes des solutions pareto optimales contenues dans pareto
-    pareto : dict contenant pour chaque critère la liste des indices des solutions opt
+    returns a set of all the pareto solutions contained in pareto
+    pareto : dictionary containing for each criterion a list of pareto
     """
     rows = []
     for pareto_list in pareto.values():
@@ -115,8 +123,8 @@ def get_paretoList(pareto):
 
 def get_nadir(data, pareto, fav_criterion=None, bound=None):
     """
-    retourne une approximation du point nadir. Si une critère est passé en entrée
-    accompagné de sa borne inf on le prend en considération lors du calcul
+    returns the nadir point for the pareto alternatives. If a criterion is given,
+    its bound is taken into account when processing
     """
     rows = get_paretoList(pareto)
     nadir = dict((criterion,None) for criterion in pareto.keys())
@@ -129,6 +137,14 @@ def get_nadir(data, pareto, fav_criterion=None, bound=None):
     return nadir
 
 def plot(data, pareto, ideal, nadir, solution,i):
+    """
+    plots the results
+    pareto : list of indices of pareto solutions contained in data
+    ideal : dict containing for each criterion the best value for this criterion
+    nadir : dict containing for each criterion the worst value for this criterion among pareto list
+    solution : index of the row of the suggested solution
+    i : counter used when saving the figure
+    """
     
     criteria = [criterion for criterion in data.columns.values]
     
@@ -142,7 +158,7 @@ def plot(data, pareto, ideal, nadir, solution,i):
     nadir_x = nadir[criteria[0]] 
     nadir_y = nadir[criteria[1]] 
     
-    print(solution)
+#    print(solution)
     solution_x = data[criteria[0]][solution]
     solution_y = data[criteria[1]][solution]
 
@@ -156,5 +172,5 @@ def plot(data, pareto, ideal, nadir, solution,i):
     
     plt.legend(bbox_to_anchor=(0., 1.02, 1., .102), loc=3,
            ncol=2, mode="expand", borderaxespad=0.)
-    plt.savefig("result_"+str(i))
-#    plt.show()
+   
+    plt.show()

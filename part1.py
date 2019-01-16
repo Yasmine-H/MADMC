@@ -10,9 +10,11 @@ from utils import *
 
 def tchebycheff_augmente(data, pareto, w, ideal, nadir):
     """
-    data : solutions (chaque ligne correspond à un ensemble de critères)
-    ideal : point de référence
-    w : poids associés à chaque critère
+    process the aumented tchebytcheff value for each solution among pareto 
+    data : solutions (columns = criteria, rows = solutions)
+    pareto : list of indices of therows of the best solutions in data
+    ideal : reference point
+    w : weights for each criterion
     """
     pareto_list = get_paretoList(pareto)
     values = dict((row,0) for row in pareto_list) 
@@ -29,7 +31,7 @@ def tchebycheff_augmente(data, pareto, w, ideal, nadir):
 
 def update_pareto(data, pareto, fav_criterion, bound):
     """
-    met à jour les pareto en fonction du critère passé en entrée
+    update the pareto list according to the criterion fav_criterion and its bound
     """
     new_pareto =  dict((criterion,[]) for criterion in pareto.keys()) 
     
@@ -43,6 +45,10 @@ def update_pareto(data, pareto, fav_criterion, bound):
 
 
 def interaction(df, data):
+    
+    """
+    interactive exploration of the pareto front using augmented tchebytcheff
+    """
     
     stop = False
     pareto = get_pareto(data)
@@ -117,7 +123,8 @@ def interaction(df, data):
 df = pandas.read_csv('voitures.csv')
 #print(df)
 #data = df[['presentation(max)','chassis(max)','prix(min)']] # valeurs utilisées
-data = df[['pollution(min)','couple moteur(max)']] # valeurs utilisées
+#data = df[['pollution(min)','couple moteur(max)']] # valeurs utilisées
+data = df[['prix(min)','presentation(max)']] # valeurs utilisées
 print(data)
 
 
